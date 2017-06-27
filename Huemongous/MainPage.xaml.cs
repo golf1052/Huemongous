@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Huemongous.Bindings;
+using Q42.HueApi;
+using Q42.HueApi.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -22,9 +26,28 @@ namespace Huemongous
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        public ObservableCollection<LightListViewBinding> LightsCollection { get; set; }
+        
+
         public MainPage()
         {
             this.InitializeComponent();
+            LightsCollection = new ObservableCollection<LightListViewBinding>();
+        }
+
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        {
+            var lights = (await AppConstants.HueClient.GetLightsAsync()).ToList();
+            foreach (var light in lights)
+            {
+                LightsCollection.Add(new LightListViewBinding(light.Name, light.Id));
+            }
+            base.OnNavigatedTo(e);
+        }
+
+        private void lightListView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            Frame.Navigate(typeof(LightPage), ((LightListViewBinding)e.ClickedItem).Number);
         }
     }
 }

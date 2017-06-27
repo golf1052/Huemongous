@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Q42.HueApi;
+using Q42.HueApi.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,7 +39,7 @@ namespace Huemongous
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
 
@@ -63,6 +65,13 @@ namespace Huemongous
             {
                 if (rootFrame.Content == null)
                 {
+                    IBridgeLocator locator = new HttpBridgeLocator();
+                    var ips = (await locator.LocateBridgesAsync(TimeSpan.FromSeconds(5))).ToList();
+                    if (ips.Count > 0)
+                    {
+                        AppConstants.HueClient = new LocalHueClient(ips[0].IpAddress, Secrets.HueUsername);
+                    }
+
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter

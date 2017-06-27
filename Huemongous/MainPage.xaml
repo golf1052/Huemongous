@@ -6,8 +6,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
+    <Page.Resources>
+        <DataTemplate x:Key="LightListItem">
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock TextWrapping="Wrap" Text="{Binding Name}" d:LayoutOverrides="Width" Margin="0" FontSize="32"/>
+                    <TextBlock TextWrapping="Wrap" Text="{Binding Number}" d:LayoutOverrides="Width" Margin="5,0,0,0" FontSize="32"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <ListView x:Name="lightListView" ItemTemplate="{StaticResource LightListItem}" ItemsSource="{x:Bind LightsCollection}" IsItemClickEnabled="True" ItemClick="lightListView_ItemClick"/>
 
     </Grid>
 </Page>
