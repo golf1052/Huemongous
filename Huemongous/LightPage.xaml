@@ -10,8 +10,17 @@
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
             <RadioButton x:Name="otherRadioButton" Content="Other" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" GroupName="lightState" IsChecked="True" MinWidth="0"/>
-            <RadioButton x:Name="fluxRadioButton" Content="f.lux" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" GroupName="lightState" MinWidth="0"/>
+            <RadioButton x:Name="fluxRadioButton" Content="f.lux" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" GroupName="lightState" MinWidth="0" Checked="fluxRadioButton_Checked" Unchecked="fluxRadioButton_Unchecked"/>
         </StackPanel>
-        <ToggleSwitch x:Name="lightSwitch" Header="" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Left" MinWidth="0"/>
+        <ToggleSwitch x:Name="lightSwitch" Header="" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Left" MinWidth="0" Toggled="lightSwitch_Toggled"/>
+        <ComboBox x:Name="tempComboBox" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" SelectionChanged="tempComboBox_SelectionChanged">
+            <ComboBoxItem Content="6500K: Daylight" Tag="6500"/>
+            <ComboBoxItem Content="5500K: Sunlight" Tag="5500"/>
+            <ComboBoxItem Content="4200K: Fluorescent" Tag="4200"/>
+            <ComboBoxItem Content="3400K: Halogen" Tag="3400"/>
+            <ComboBoxItem Content="2700K: Incandescent" Tag="2700"/>
+            <ComboBoxItem Content="2300K: Dim Incandescent" Tag="2300"/>
+            <ComboBoxItem Content="2000K: Candle" Tag="2000"/>
+        </ComboBox>
     </Grid>
 </Page>
