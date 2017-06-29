@@ -27,6 +27,7 @@ namespace Huemongous
     /// </summary>
     public sealed partial class LightPage : Page
     {
+        string lightId;
         Light light;
         bool justLoaded = true;
         HttpClient httpClient;
@@ -42,7 +43,8 @@ namespace Huemongous
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            light = await AppConstants.HueClient.GetLightAsync((string)e.Parameter);
+            lightId = (string)e.Parameter;
+            light = await AppConstants.HueClient.GetLightAsync(lightId);
             lightSwitch.IsOn = light.State.On;
             justLoaded = false;
             await GetTimeOfDay();
@@ -64,34 +66,42 @@ namespace Huemongous
 
         async Task UpdateLight()
         {
-            DateTime startTime = sunset - TimeSpan.FromMinutes(30);
-            DateTime endTime = sunset + TimeSpan.FromMinutes(30);
-            while (DateTime.Now >= startTime && DateTime.Now <= endTime)
+            while (true)
             {
-                int startingTemp = 6500;
-                int endingTemp = 2000;
-                TimeSpan transitionTime = TimeSpan.FromHours(1);
-                double amountPerMin = (startingTemp - endingTemp) / transitionTime.TotalMinutes;
-                double amount = (DateTime.Now - startTime).TotalMinutes * amountPerMin;
-                double desiredTemp = startingTemp - amount;
-                int mired = GetMired((int)desiredTemp);
-                LightCommand command = new LightCommand();
-                command.ColorTemperature = mired;
-                command.TransitionTime = TimeSpan.FromSeconds(60);
-                AppConstants.HueClient.SendCommandAsync(command, new List<string> { light.Id });
+                if (!light.State.On)
+                {
+                    await Task.Delay(TimeSpan.FromMinutes(1));
+                    continue;
+                }
+                DateTime startTime = sunset - TimeSpan.FromMinutes(30);
+                DateTime endTime = sunset + TimeSpan.FromMinutes(30);
+                if (DateTime.Now >= startTime && DateTime.Now <= endTime)
+                {
+                    int startingTemp = 6500;
+                    int endingTemp = 2000;
+                    TimeSpan transitionTime = TimeSpan.FromHours(1);
+                    double amountPerMin = (startingTemp - endingTemp) / transitionTime.TotalMinutes;
+                    double amount = (DateTime.Now - startTime).TotalMinutes * amountPerMin;
+                    double desiredTemp = startingTemp - amount;
+                    int mired = GetMired((int)desiredTemp);
+                    LightCommand command = new LightCommand();
+                    command.ColorTemperature = mired;
+                    command.TransitionTime = TimeSpan.FromSeconds(60);
+                    AppConstants.HueClient.SendCommandAsync(command, new List<string> { light.Id });
+                }
+                else if (DateTime.Now > endTime)
+                {
+                    LightCommand command = new LightCommand();
+                    command.ColorTemperature = GetMired(2000);
+                    AppConstants.HueClient.SendCommandAsync(command, new List<string> { light.Id });
+                }
+                else if (DateTime.Now < startTime)
+                {
+                    LightCommand command = new LightCommand();
+                    command.ColorTemperature = GetMired(6500);
+                    AppConstants.HueClient.SendCommandAsync(command, new List<string> { light.Id });
+                }
                 await Task.Delay(TimeSpan.FromMinutes(1));
-            }
-            if (DateTime.Now > endTime)
-            {
-                LightCommand command = new LightCommand();
-                command.ColorTemperature = GetMired(2000);
-                AppConstants.HueClient.SendCommandAsync(command, new List<string> { light.Id });
-            }
-            else if (DateTime.Now < startTime)
-            {
-                LightCommand command = new LightCommand();
-                command.ColorTemperature = GetMired(6500);
-                AppConstants.HueClient.SendCommandAsync(command, new List<string> { light.Id });
             }
         }
 
@@ -111,7 +121,7 @@ namespace Huemongous
             tempComboBox.Visibility = Visibility.Collapsed;
         }
 
-        private void lightSwitch_Toggled(object sender, RoutedEventArgs e)
+        private async void lightSwitch_Toggled(object sender, RoutedEventArgs e)
         {
             if (lightSwitch.IsOn)
             {
@@ -125,6 +135,7 @@ namespace Huemongous
                 command.On = false;
                 AppConstants.HueClient.SendCommandAsync(command, new List<string>() { light.Id });
             }
+            await UpdateLightObj();
         }
 
         private void tempComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -143,6 +154,11 @@ namespace Huemongous
         int GetMired(int temp)
         {
             return 1000000 / temp;
+        }
+
+        async Task UpdateLightObj()
+        {
+            light = await AppConstants.HueClient.GetLightAsync(lightId);
         }
     }
 }
