@@ -18,7 +18,12 @@
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
         <ListView x:Name="lightListView" ItemTemplate="{StaticResource LightListItem}" ItemsSource="{x:Bind LightsCollection}" IsItemClickEnabled="True" ItemClick="lightListView_ItemClick"/>
+        <StackPanel x:Name="tileStackPanel" Grid.Row="1"/>
 
     </Grid>
 </Page>

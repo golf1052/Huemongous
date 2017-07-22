@@ -97,6 +97,7 @@
     </Compile>
     <Compile Include="AppConstants.cs" />
     <Compile Include="Bindings\LightListViewBinding.cs" />
+    <Compile Include="HelperMethods.cs" />
     <Compile Include="LightPage.xaml.cs">
       <DependentUpon>LightPage.xaml</DependentUpon>
     </Compile>

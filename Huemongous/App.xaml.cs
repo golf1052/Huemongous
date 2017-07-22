@@ -80,6 +80,28 @@ namespace Huemongous
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
+
+            if (!string.IsNullOrEmpty(e.Arguments))
+            {
+                string lightToToggle = e.Arguments;
+                var light = await AppConstants.HueClient.GetLightAsync(lightToToggle);
+                if (light.State.On)
+                {
+                    LightCommand command = new LightCommand();
+                    command.On = false;
+                    await AppConstants.HueClient.SendCommandAsync(command, new List<string> { lightToToggle });
+                    Exit();
+                }
+                else
+                {
+                    LightCommand command = new LightCommand();
+                    command.On = true;
+                    command.Brightness = 128;
+                    command.ColorTemperature = HelperMethods.GetMired(3200);
+                    await AppConstants.HueClient.SendCommandAsync(command, new List<string> { lightToToggle });
+                    Exit();
+                }
+            }
         }
 
         /// <summary>

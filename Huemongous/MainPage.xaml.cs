@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.StartScreen;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -41,7 +42,14 @@ namespace Huemongous
             foreach (var light in lights)
             {
                 LightsCollection.Add(new LightListViewBinding(light.Name, light.Id));
+                if (!SecondaryTile.Exists(light.Id))
+                {
+                    SecondaryTile tile = new SecondaryTile(light.Id, light.Name, $"{light.Id}", new Uri("ms-appx:///Assets/Square150x150Logo.scale-200.png"), TileSize.Square150x150);
+                    tile.VisualElements.ShowNameOnSquare150x150Logo = true;
+                    await tile.RequestCreateAsync();
+                }
             }
+
             base.OnNavigatedTo(e);
         }
 

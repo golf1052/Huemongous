@@ -83,7 +83,7 @@ namespace Huemongous
                     double amountPerMin = (startingTemp - endingTemp) / transitionTime.TotalMinutes;
                     double amount = (DateTime.Now - startTime).TotalMinutes * amountPerMin;
                     double desiredTemp = startingTemp - amount;
-                    int mired = GetMired((int)desiredTemp);
+                    int mired = HelperMethods.GetMired((int)desiredTemp);
                     LightCommand command = new LightCommand();
                     command.ColorTemperature = mired;
                     command.TransitionTime = TimeSpan.FromSeconds(60);
@@ -92,13 +92,13 @@ namespace Huemongous
                 else if (DateTime.Now > endTime)
                 {
                     LightCommand command = new LightCommand();
-                    command.ColorTemperature = GetMired(2000);
+                    command.ColorTemperature = HelperMethods.GetMired(2000);
                     AppConstants.HueClient.SendCommandAsync(command, new List<string> { light.Id });
                 }
                 else if (DateTime.Now < startTime)
                 {
                     LightCommand command = new LightCommand();
-                    command.ColorTemperature = GetMired(6500);
+                    command.ColorTemperature = HelperMethods.GetMired(6500);
                     AppConstants.HueClient.SendCommandAsync(command, new List<string> { light.Id });
                 }
                 await Task.Delay(TimeSpan.FromMinutes(1));
@@ -145,16 +145,13 @@ namespace Huemongous
                 return;
             }
             int selectedTemp = int.Parse((string)((ComboBoxItem)tempComboBox.SelectedItem).Tag);
-            int mired = GetMired(selectedTemp);
+            int mired = HelperMethods.GetMired(selectedTemp);
             LightCommand command = new LightCommand();
             command.ColorTemperature = mired;
             AppConstants.HueClient.SendCommandAsync(command, new List<string>() { light.Id });
         }
 
-        int GetMired(int temp)
-        {
-            return 1000000 / temp;
-        }
+        
 
         async Task UpdateLightObj()
         {
