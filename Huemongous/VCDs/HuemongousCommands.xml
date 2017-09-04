@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VoiceCommands xmlns="http://schemas.microsoft.com/voicecommands/1.2">
+  <CommandSet xml:lang="en-us" Name="HuemongousCommandSet">
+    <AppName>Hue</AppName>
+    <Example>Turn on my Hue lights</Example>
+    
+    <Command Name="LightsOnOrOff">
+      <Example>Turn on my Hue lights</Example>
+      <ListenFor RequireAppName="ExplicitlySpecified">[turn] [all] [of] [my] [the] {builtin:AppName} lights {lightState}</ListenFor>
+      <ListenFor RequireAppName="ExplicitlySpecified">turn {lightState} [all] [of] [my] [the] {builtin:AppName} lights</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">[turn] [all] [of] [my] [the] lights {lightState}</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">turn {lightState} [all] [of] [my] [the] lights</ListenFor>
+      <Feedback>Turning your lights {lightState}</Feedback>
+      <VoiceCommandService Target="HuemongousVoiceCommandService"/>
+    </Command>
+    
+    <Command Name="LightOnOrOff">
+      <Example>Turn my bedroom Hue light on</Example>
+      <ListenFor RequireAppName="ExplicitlySpecified">[turn] [my] [the] {lightOrRoom} {builtin:AppName} {lightPlurality} {lightState}</ListenFor>
+      <ListenFor RequireAppName="ExplicitlySpecified">turn {lightState} [my] [the] {lightOrRoom} {builtin:AppName} {lightPlurality}</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">[turn] [my] [the] {lightOrRoom} {lightPlurality} {lightState}</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">turn {lightState} [my] [the] {lightOrRoom} {lightPlurality}</ListenFor>
+      <Feedback>Turning your {lightOrRoom} {lightPlurality} {lightState}</Feedback>
+      <VoiceCommandService Target="HuemongousVoiceCommandService"/>
+    </Command>
+    
+    <Command Name="SpecifyLightOnOrOff">
+      <Example>Turn my Hue light on</Example>
+      <ListenFor RequireAppName="ExplicitlySpecified">[turn] [my] [the] {builtin:AppName} light {lightState}</ListenFor>
+      <ListenFor RequireAppName="ExplicitlySpecified">turn {lightState} [my] [the] {builtin:AppName} light</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">[turn] [my] [the] light {lightState}</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">turn {lightState} [my] [the] light</ListenFor>
+      <Feedback>Turning your light {lightState}</Feedback>
+      <VoiceCommandService Target="HuemongousVoiceCommandService"/>
+    </Command>
+      
+    <Command Name="SetLightScene">
+      <Example>Set Hue scene to party</Example>
+      <ListenFor RequireAppName="ExplicitlySpecified">[set] {builtin:AppName} [scene] [to] {scene}</ListenFor>
+      <ListenFor RequireAppName="BeforePhrase">[set] [scene] [to] {scene}</ListenFor>
+      <Feedback>Setting scene to {scene}</Feedback>
+      <VoiceCommandService Target="HuemongousVoiceCommandService"/>
+    </Command>
+    
+    <Command Name="SetLightsColor">
+      <Example>Turn my Hue lights blue</Example>
+      <ListenFor RequireAppName="ExplicitlySpecified">[turn] [all] [of] [my] [the] {builtin:AppName} lights [to] {color}</ListenFor>
+      <ListenFor RequireAppName="ExplicitlySpecified">turn {color} [all] [of] [my] [the] {builtin:AppName} lights</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">[turn] [all] [of] [my] [the] lights [to] {color}</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">turn {color} [all] [of] [my] [the] lights</ListenFor>
+      <Feedback>Turning your lights {color}</Feedback>
+      <VoiceCommandService Target="HuemongousVoiceCommandService"/>
+    </Command>
+      
+    <Command Name="SetLightColor">
+      <Example>Turn my bedroom Hue lights blue</Example>
+      <ListenFor RequireAppName="ExplicitlySpecified">[turn] [my] [the] {lightOrRoom} {builtin:AppName} {lightPlurality} {color}</ListenFor>
+      <ListenFor RequireAppName="ExplicitlySpecified">turn {color} [my] [the] {lightOrRoom} {builtin:AppName} {lightPlurality}</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">[turn] [my] [the] {lightOrRoom} {lightPlurality} {color}</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">turn {color} [my] [the] {lightOrRoom} {lightPlurality}</ListenFor>
+      <Feedback>Turning your {lightOrRoom} {lightPlurality} {color}</Feedback>
+      <VoiceCommandService Target="HuemongousVoiceCommandService"/>
+    </Command>
+        
+    <Command Name="SpecifyLightColor">
+      <Example>Turn my Hue light blue</Example>
+      <ListenFor RequireAppName="ExplicitlySpecified">[turn] [my] [the] {builtin:AppName} light {color}</ListenFor>
+      <ListenFor RequireAppName="ExplicitlySpecified">turn {color} [my] [the] {builtin:AppName} light</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">[turn] [my] [the] light {color}</ListenFor>
+      <ListenFor RequireAppName="BeforeOrAfterPhrase">turn {color} [my] [the] light</ListenFor>
+      <Feedback>Turning your light {color}</Feedback>
+      <VoiceCommandService Target="HuemongousVoiceCommandService"/>
+    </Command>
+
+    <PhraseList Label="lightPlurality">
+      <Item>light</Item>
+      <Item>lights</Item>
+    </PhraseList>
+
+    <PhraseList Label="lightState">
+      <Item>on</Item>
+      <Item>off</Item>
+    </PhraseList>
+
+    <PhraseList Label="lightOrRoom">
+    </PhraseList>
+    
+    <PhraseList Label="scene">
+    </PhraseList>
+
+    <PhraseList Label="color">
+    </PhraseList>
+  </CommandSet>
+</VoiceCommands> 

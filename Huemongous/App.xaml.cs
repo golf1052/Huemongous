@@ -16,6 +16,11 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.Storage;
+using System.Diagnostics;
+using Windows.ApplicationModel.VoiceCommands;
+using System.Threading.Tasks;
+using Windows.Media.SpeechRecognition;
 
 namespace Huemongous
 {
@@ -41,6 +46,25 @@ namespace Huemongous
         /// <param name="e">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
+            await OnLaunchedOrActivated(e);
+        }
+
+        protected override async void OnActivated(IActivatedEventArgs args)
+        {
+            await OnLaunchedOrActivated(args);
+        }
+
+        private async Task OnLaunchedOrActivated(IActivatedEventArgs e)
+        {
+            try
+            {
+                StorageFile vcdStorageFile = await Package.Current.InstalledLocation.GetFileAsync("VCDs\\HuemongousCommands.xml");
+                await VoiceCommandDefinitionManager.InstallCommandDefinitionsFromStorageFileAsync(vcdStorageFile);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Installing voice commands failed: {ex.ToString()}");
+            }
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -61,47 +85,121 @@ namespace Huemongous
                 Window.Current.Content = rootFrame;
             }
 
-            if (e.PrelaunchActivated == false)
+            if (e.Kind == ActivationKind.Launch)
             {
-                if (rootFrame.Content == null)
+                LaunchActivatedEventArgs args = e as LaunchActivatedEventArgs;
+                if (args.PrelaunchActivated == false)
                 {
-                    IBridgeLocator locator = new HttpBridgeLocator();
-                    var ips = (await locator.LocateBridgesAsync(TimeSpan.FromSeconds(5))).ToList();
-                    if (ips.Count > 0)
+                    if (rootFrame.Content == null)
                     {
-                        AppConstants.HueClient = new LocalHueClient(ips[0].IpAddress, Secrets.HueUsername);
+                        IBridgeLocator locator = new HttpBridgeLocator();
+                        var ips = (await locator.LocateBridgesAsync(TimeSpan.FromSeconds(5))).ToList();
+                        if (ips.Count > 0)
+                        {
+                            AppConstants.HueClient = new LocalHueClient(ips[0].IpAddress, Secrets.HueUsername);
+                        }
+
+                        // When the navigation stack isn't restored navigate to the first page,
+                        // configuring the new page by passing required information as a navigation
+                        // parameter
+                        rootFrame.Navigate(typeof(MainPage), args.Arguments);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(args.Arguments))
+                {
+                    string lightToToggle = args.Arguments;
+                    var light = await AppConstants.HueClient.GetLightAsync(lightToToggle);
+                    if (light.State.On)
+                    {
+                        LightCommand command = new LightCommand();
+                        command.On = false;
+                        await AppConstants.HueClient.SendCommandAsync(command, new List<string> { lightToToggle });
+                        Exit();
+                    }
+                    else
+                    {
+                        LightCommand command = new LightCommand();
+                        command.On = true;
+                        command.Brightness = 128;
+                        command.ColorTemperature = HelperMethods.GetMired(3200);
+                        await AppConstants.HueClient.SendCommandAsync(command, new List<string> { lightToToggle });
+                        Exit();
+                    }
+                }
+            }
+
+            // Update lights, rooms, and scenes in VCD
+            try
+            {
+                VoiceCommandDefinition vcd;
+                if (VoiceCommandDefinitionManager.InstalledCommandDefinitions.TryGetValue("HuemongousCommandSet", out vcd))
+                {
+                    List<string> lightOrRoom = new List<string>();
+
+                    var lights = await AppConstants.HueClient.GetLightsAsync();
+                    foreach (var light in lights)
+                    {
+                        lightOrRoom.Add(light.Name.ToLower());
                     }
 
-                    // When the navigation stack isn't restored navigate to the first page,
-                    // configuring the new page by passing required information as a navigation
-                    // parameter
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    var rooms = await AppConstants.HueClient.GetGroupsAsync();
+                    foreach (var room in rooms)
+                    {
+                        lightOrRoom.Add(room.Name.ToLower());
+                    }
+
+                    List<string> scenesList = new List<string>();
+
+                    var scenes = await AppConstants.HueClient.GetScenesAsync();
+                    foreach (var scene in scenes)
+                    {
+                        scenesList.Add(scene.Name.ToLower());
+                    }
+
+                    await vcd.SetPhraseListAsync("lightOrRoom", lightOrRoom);
+                    await vcd.SetPhraseListAsync("scene", scenesList);
                 }
-                // Ensure the current window is active
-                Window.Current.Activate();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to update phrase list for VCDs: {ex.ToString()}");
             }
 
-            if (!string.IsNullOrEmpty(e.Arguments))
+            if (e.Kind == ActivationKind.VoiceCommand)
             {
-                string lightToToggle = e.Arguments;
-                var light = await AppConstants.HueClient.GetLightAsync(lightToToggle);
-                if (light.State.On)
+                try
                 {
-                    LightCommand command = new LightCommand();
-                    command.On = false;
-                    await AppConstants.HueClient.SendCommandAsync(command, new List<string> { lightToToggle });
-                    Exit();
+                    VoiceCommandActivatedEventArgs args = e as VoiceCommandActivatedEventArgs;
+                    SpeechRecognitionResult speechRecognitionResult = args.Result;
+
+                    string voiceCommandName = speechRecognitionResult.RulePath[0];
+                    string textSpoken = speechRecognitionResult.Text;
+
+                    foreach (var prop in speechRecognitionResult.SemanticInterpretation.Properties)
+                    {
+                        Debug.WriteLine($"Key: {prop.Key}");
+                        foreach (var val in prop.Value)
+                        {
+                            Debug.WriteLine($"Value: {val}");
+                        }
+                        Debug.WriteLine("");
+                    }
+                    string commandMode = SemanticInterpretation("commandMode", speechRecognitionResult);
                 }
-                else
+                catch (Exception ex)
                 {
-                    LightCommand command = new LightCommand();
-                    command.On = true;
-                    command.Brightness = 128;
-                    command.ColorTemperature = HelperMethods.GetMired(3200);
-                    await AppConstants.HueClient.SendCommandAsync(command, new List<string> { lightToToggle });
-                    Exit();
+                    Debug.WriteLine("help");
                 }
             }
+
+            // Ensure the current window is active
+            Window.Current.Activate();
+        }
+
+        private string SemanticInterpretation(string interpretationKey, SpeechRecognitionResult speechRecognitionResult)
+        {
+            return speechRecognitionResult.SemanticInterpretation.Properties[interpretationKey].FirstOrDefault();
         }
 
         /// <summary>

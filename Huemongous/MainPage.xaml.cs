@@ -42,12 +42,12 @@ namespace Huemongous
             foreach (var light in lights)
             {
                 LightsCollection.Add(new LightListViewBinding(light.Name, light.Id));
-                if (!SecondaryTile.Exists(light.Id))
-                {
-                    SecondaryTile tile = new SecondaryTile(light.Id, light.Name, $"{light.Id}", new Uri("ms-appx:///Assets/Square150x150Logo.scale-200.png"), TileSize.Square150x150);
-                    tile.VisualElements.ShowNameOnSquare150x150Logo = true;
-                    await tile.RequestCreateAsync();
-                }
+                //if (!SecondaryTile.Exists(light.Id))
+                //{
+                //    SecondaryTile tile = new SecondaryTile(light.Id, light.Name, $"{light.Id}", new Uri("ms-appx:///Assets/Square150x150Logo.scale-200.png"), TileSize.Square150x150);
+                //    tile.VisualElements.ShowNameOnSquare150x150Logo = true;
+                //    await tile.RequestCreateAsync();
+                //}
             }
 
             base.OnNavigatedTo(e);

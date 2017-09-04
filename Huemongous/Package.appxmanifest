@@ -20,6 +20,12 @@
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.appService" EntryPoint="Huemongous.VoiceCommands.HuemongousVoiceCommandService">
+          <uap:AppService Name="HuemongousVoiceCommandService" />
+        </uap:Extension>
+        <uap:Extension Category="windows.personalAssistantLaunch" />
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>
