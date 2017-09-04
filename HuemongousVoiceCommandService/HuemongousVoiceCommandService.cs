@@ -84,6 +84,7 @@ namespace Huemongous.VoiceCommands
                 else if (voiceCommand.CommandName == "SetLightsColor")
                 {
                     string color = voiceCommand.Properties["color"][0];
+                    await HandleSetLightsColor(color);
                 }
                 else if (voiceCommand.CommandName == "SetLightColor")
                 {
@@ -241,6 +242,16 @@ namespace Huemongous.VoiceCommands
                 return;
             }
 
+            VoiceCommandResponse response = VoiceCommandResponse.CreateResponse(userMessage);
+            await voiceServiceConnection.ReportSuccessAsync(response);
+        }
+
+        private async Task HandleSetLightsColor(string color)
+        {
+            await ShowProgressScreen("Hold on");
+            Debug.WriteLine($"Got color {color}");
+            VoiceCommandUserMessage userMessage = new VoiceCommandUserMessage();
+            string defaultMessage = $"Turning your lights {color}";
             VoiceCommandResponse response = VoiceCommandResponse.CreateResponse(userMessage);
             await voiceServiceConnection.ReportSuccessAsync(response);
         }

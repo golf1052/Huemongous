@@ -21,6 +21,9 @@ using System.Diagnostics;
 using Windows.ApplicationModel.VoiceCommands;
 using System.Threading.Tasks;
 using Windows.Media.SpeechRecognition;
+using Windows.UI;
+using System.Text;
+using System.Reflection;
 
 namespace Huemongous
 {
@@ -129,7 +132,7 @@ namespace Huemongous
                 }
             }
 
-            // Update lights, rooms, and scenes in VCD
+            // Update lights, rooms, scenes, and colors in VCD
             try
             {
                 VoiceCommandDefinition vcd;
@@ -157,8 +160,26 @@ namespace Huemongous
                         scenesList.Add(scene.Name.ToLower());
                     }
 
+                    List<string> colors = new List<string>();
+                    foreach (var value in typeof(Colors).GetTypeInfo().DeclaredProperties)
+                    {
+                        string color = value.Name;
+                        StringBuilder humanReadableColor = new StringBuilder();
+                        foreach (var c in color)
+                        {
+                            // if c is a capitol letter append a space before it
+                            if (c > 64 && c < 91)
+                            {
+                                humanReadableColor.Append(" ");
+                            }
+                            humanReadableColor.Append(c);
+                        }
+                        colors.Add(humanReadableColor.ToString().Trim().ToLower());
+                    }
+
                     await vcd.SetPhraseListAsync("lightOrRoom", lightOrRoom);
                     await vcd.SetPhraseListAsync("scene", scenesList);
+                    await vcd.SetPhraseListAsync("color", colors);
                 }
             }
             catch (Exception ex)

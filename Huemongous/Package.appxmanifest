@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="f6fc2167-607f-43e5-b3a4-9dd50d9c6c4a" Publisher="CN=Sanders" Version="1.0.0.0" />
+  <Identity Name="f6fc2167-607f-43e5-b3a4-9dd50d9c6c4a" Publisher="CN=Sanders" Version="1.0.1.0" />
   <mp:PhoneIdentity PhoneProductId="f6fc2167-607f-43e5-b3a4-9dd50d9c6c4a" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Huemongous</DisplayName>
@@ -21,10 +21,10 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
+        <uap:Extension Category="windows.personalAssistantLaunch" />
         <uap:Extension Category="windows.appService" EntryPoint="Huemongous.VoiceCommands.HuemongousVoiceCommandService">
           <uap:AppService Name="HuemongousVoiceCommandService" />
         </uap:Extension>
-        <uap:Extension Category="windows.personalAssistantLaunch" />
       </Extensions>
     </Application>
   </Applications>
